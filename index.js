@@ -31,7 +31,7 @@ function escape(html){
 }
 
 // Based on connect.static(), but streamlined and with added code injecter
-function staticServer(root) {
+function staticServer(root, options) {
 	var isFile = false;
 	try { // For supporting mounting files instead of just directories
 		isFile = fs.statSync(root).isFile();
@@ -44,6 +44,7 @@ function staticServer(root) {
 		var hasNoOrigin = !req.headers.origin;
 		var injectCandidates = [ new RegExp("</body>", "i"), new RegExp("</svg>"), new RegExp("</head>", "i")];
 		var injectTag = null;
+
 
 		function directory() {
 			var pathname = url.parse(req.originalUrl).pathname;
@@ -79,13 +80,17 @@ function staticServer(root) {
 
 		function inject(stream) {
 			if (injectTag) {
-				// We need to modify the length given to browser
-				var len = INJECTED_CODE.length + res.getHeader('Content-Length');
-				res.setHeader('Content-Length', len);
-				var originalPipe = stream.pipe;
-				stream.pipe = function(resp) {
-					originalPipe.call(stream, es.replace(new RegExp(injectTag, "i"), INJECTED_CODE + injectTag)).pipe(resp);
-				};
+				if (options && options.inject) {
+					options.inject(res, stream, injectTag);
+				} else {
+					// We need to modify the length given to browser
+					var len = INJECTED_CODE.length + res.getHeader('Content-Length');
+					res.setHeader('Content-Length', len);
+					var originalPipe = stream.pipe;
+					stream.pipe = function(resp) {
+						originalPipe.call(stream, es.replace(new RegExp(injectTag, "i"), INJECTED_CODE + injectTag)).pipe(resp);
+					};
+				}
 			}
 		}
 
@@ -141,7 +146,7 @@ LiveServer.start = function(options) {
 		"" : ((options.open === null || options.open === false) ? null : options.open);
 	if (options.noBrowser) openPath = null; // Backwards compatibility with 0.7.0
 	var file = options.file;
-	var staticServerHandler = staticServer(root);
+	var staticServerHandler = staticServer(root, options);
 	var wait = options.wait === undefined ? 100 : options.wait;
 	var browser = options.browser || null;
 	var htpasswd = options.htpasswd || null;
