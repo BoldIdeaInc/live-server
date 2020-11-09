@@ -79,10 +79,10 @@ function staticServer(root, options) {
 		}
 
 		function inject(stream) {
-			if (injectTag) {
-				if (options && options.inject) {
-					options.inject(res, stream, injectTag);
-				} else {
+			if (options && options.inject) {
+				options.inject(res, stream, injectTag);
+			} else {
+				if (injectTag) {
 					// We need to modify the length given to browser
 					var len = INJECTED_CODE.length + res.getHeader('Content-Length');
 					res.setHeader('Content-Length', len);
@@ -216,7 +216,7 @@ LiveServer.start = function(options) {
 		var mountPath = path.resolve(process.cwd(), mountRule[1]);
 		if (!options.watch) // Auto add mount paths to wathing but only if exclusive path option is not given
 			watchPaths.push(mountPath);
-		app.use(mountRule[0], staticServer(mountPath));
+		app.use(mountRule[0], staticServer(mountPath, options));
 		if (LiveServer.logLevel >= 1)
 			console.log('Mapping %s to "%s"', mountRule[0], mountPath);
 	});
