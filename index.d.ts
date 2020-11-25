@@ -29,6 +29,8 @@ export interface LiveServerParams {
     middleware?: Array<(req: any, res: any, next: any) => void>;
 	/** Overrides the default code injection logic */
 	inject?: (res: any, stream: any, injectTag: any) => void;
+	/** If true, code is injected at beginning of document, otherwise, it is injected at the end **/
+	injectDocStart?: boolean;
 }
 
 /**
