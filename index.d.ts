@@ -13,6 +13,8 @@ export interface LiveServerParams {
     host?: string;
     /** Set root directory that's being served. Defaults to cwd. */
     root?: string;
+    /** Paths to exclusively watch for changes. Defaults to everything */
+    watch?: string[];
     /** When false, it won't load your browser by default. */
     open?: boolean;
     /** Comma-separated string for paths to ignore. */
@@ -27,10 +29,10 @@ export interface LiveServerParams {
     logLevel?: 0 | 1 | 2;
     /** Takes an array of Connect-compatible middleware that are injected into the server middleware stack. */
     middleware?: Array<(req: any, res: any, next: any) => void>;
-	/** Overrides the default code injection logic */
-	inject?: (res: any, stream: any, injectTag: any) => void;
-	/** If true, code is injected at beginning of document, otherwise, it is injected at the end **/
-	injectDocStart?: boolean;
+    /** Overrides the default code injection logic */
+    inject?: (res: any, stream: any, injectTag: any) => void;
+    /** If true, code is injected at beginning of document, otherwise, it is injected at the end **/
+    injectDocStart?: boolean;
 }
 
 /**
